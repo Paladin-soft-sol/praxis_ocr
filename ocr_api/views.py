@@ -41,17 +41,24 @@ class Ocr(generics.GenericAPIView):
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
-        ocr_file = request.FILES.get('file', False)
+        print("data\n",request.data)
+
+        ocr_file = request.data.get('file', False)
         patient_id=request.data.get('patient_id',False)
+        report_id=request.data.get('report_id',False)
+        if report_id=="":
+            return Response({"status":"fail","message": "report_id is required"},status=status.HTTP_400_BAD_REQUEST)
        
         if patient_id=="":
             return Response({"status":"fail","message": "patient_id is required"},status=status.HTTP_400_BAD_REQUEST)
-
-            
-        print("patient_id \n",patient_id)
-        print("ocr_file \n",ocr_file)
-        if ocr_file==False:          
+        
+        if ocr_file=="":
             return Response({"status":"fail","message": "file is required"},status=status.HTTP_400_BAD_REQUEST)
+
+        if  OcrModel.objects.filter(report_id=report_id).exists():
+             return Response({"status":"fail","message": "report_id is already exits"},status=status.HTTP_400_BAD_REQUEST)
+
+       
 
 
         if ocr_file:
@@ -60,7 +67,7 @@ class Ocr(generics.GenericAPIView):
              return Response({"status":"fail","message": "pdf to excel conversion failed"},status=status.HTTP_400_BAD_REQUEST)
 
              
-          request.data._mutable = True
+          request.POST._mutable = True          
           request.data["lab_report"]=file_url
           serializer = self.serializer_class(data=request.data)
           if serializer.is_valid(): 
@@ -73,14 +80,14 @@ class OcrDetail(generics.GenericAPIView):
 
     def getOcrById(self, pk):
          try:
-            return OcrModel.objects.get(patient_id=pk)
+            return OcrModel.objects.get(report_id=pk)
          except:
             return None
 
-    def get(self, request, pk):
-        data = self.getOcrById(pk=pk)
+    def get(self, request, report_id):
+        data = self.getOcrById(pk=report_id)
         if data == None:
-            return Response({"status": "fail", "message": f"Note with Id: {pk} not found","data":[]}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"status": "fail", "message": f"report_id: {pk} not found","data":[]}, status=status.HTTP_404_NOT_FOUND)
         else:
             print('data\n',data.lab_report)
             lab_data=json.loads(data.lab_report)

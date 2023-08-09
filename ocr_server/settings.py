@@ -93,8 +93,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'ocr_server',
         'USER': 'root',
-        'PASSWORD': 'Aphi@123',
-        'HOST': '13.127.168.219',
+        'PASSWORD': 'petHowz@123',
+        'HOST': 'pethowz.com',
         'PORT': 3306,
     }
 }
