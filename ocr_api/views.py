@@ -97,4 +97,5 @@ class OcrDetail(generics.GenericAPIView):
               json_str = excel_data_df.to_json(orient='records')
               result.extend(json.loads(json_str))
             return Response({"status": "success", "data": result}, status=status.HTTP_200_OK)
+            
 
